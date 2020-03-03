@@ -1,4 +1,6 @@
 import numpy as np
+import os
+
 
 # Load sudokus
 sudokus = np.load("data/sudokus.npy")
@@ -44,7 +46,7 @@ class Solver:
                     return False
         return True
 
-    def lowest_variable(self, sudoku, row, col):
+    def lowest_variable(self, sudoku):
         # Returns the variable found with lowest number of constraints.
         min_val = len(sudoku)  # Initially hold maximum number of values
         for i in range(len(sudoku)):
@@ -57,7 +59,7 @@ class Solver:
                     if min_val == 1:
                         return new_row, new_col
                     
-        return row, col
+        return new_row, new_col
 
     def next_variable(self, sudoku, row, col):
         # Returns the next empty variable by searching columns by rows.
@@ -87,7 +89,10 @@ class Solver:
         for val in constraints:
             sudoku[row][col] = val  # Test value
             #new_row, new_col = self.next_variable(sudoku, row, col)
-            new_row, new_col = self.lowest_variable(sudoku, row, col)
+            new_row, new_col = self.next_variable(sudoku, row, col)
+            
+            #os.system('cls')
+            #print(sudoku)
             
             # If row and column have not changed -> SOLVED
             if new_row == row and new_col == col:
@@ -116,7 +121,8 @@ class Solver:
         solved_sudoku = sudoku
         
         while not (self.complete(solved_sudoku)):
-            start_row, start_col = self.lowest_variable(solved_sudoku, 0, 0) 
+            #start_row, start_col = self.lowest_variable(solved_sudoku, 0, 0) 
+            start_row, start_col = self.lowest_variable(sudoku)
             # Alters the values in the solved_sudoku
             # Begin depth first search from the top left square
             self.depth_first(solved_sudoku, start_row, start_col)
@@ -131,15 +137,22 @@ solver = Solver()
 
 #print("After:")
 #print(solver.sudoku_solver(sudokus[0]))
-#count = -1
-#for sudoku in sudokus:
-#    count += 1
-#    print(count)
-#    print("Before:")
-#    print(sudoku)
-#    print("After:")
-#    print(solver.sudoku_solver(sudoku))
-#    print()
+
+count = -1
+correct = 0
+for sudoku in sudokus:
+    count += 1
+    print(count)
+    print("Before:")
+    print(sudoku)
+    print("After:")
+    result = solver.sudoku_solver(sudoku)
+    print(result)
+    if np.array_equal(result, np.array(sudoku)):
+        correct += 1
+    print()
+print("Correct:", correct)
 
 
-print(solver.sudoku_solver(sudokus[9]))
+#print("After:")
+#print(solver.sudoku_solver(sudokus[10]))
