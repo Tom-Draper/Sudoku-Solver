@@ -1,7 +1,6 @@
 import numpy as np
 import os
 
-
 # Load sudokus
 sudokus = np.load("data/sudokus.npy")
 
@@ -46,21 +45,6 @@ class Solver:
                     return False
         return True
 
-    def lowest_variable(self, sudoku):
-        # Returns the variable found with lowest number of constraints.
-        min_val = len(sudoku)  # Initially hold maximum number of values
-        for i in range(len(sudoku)):
-            for j in range(len(sudoku[0])):
-                if sudoku[i][j] == 0:
-                    # If this variable has the fewest number of constraints save as start
-                    if len(self.apply_constraints(sudoku, i, j)) < min_val:
-                        min_val = len(self.apply_constraints(sudoku, i, j))
-                        new_row, new_col = i, j  # Save to return
-                    if min_val == 1:
-                        return new_row, new_col
-                    
-        return new_row, new_col
-
     def next_variable(self, sudoku, row, col):
         # Returns the next empty variable by searching columns by rows.
         
@@ -88,11 +72,7 @@ class Solver:
         
         for val in constraints:
             sudoku[row][col] = val  # Test value
-            #new_row, new_col = self.next_variable(sudoku, row, col)
             new_row, new_col = self.next_variable(sudoku, row, col)
-            
-            #os.system('cls')
-            #print(sudoku)
             
             # If row and column have not changed -> SOLVED
             if new_row == row and new_col == col:
@@ -120,39 +100,29 @@ class Solver:
         
         solved_sudoku = sudoku
         
-        while not (self.complete(solved_sudoku)):
-            #start_row, start_col = self.lowest_variable(solved_sudoku, 0, 0) 
-            start_row, start_col = self.lowest_variable(sudoku)
-            # Alters the values in the solved_sudoku
-            # Begin depth first search from the top left square
-            self.depth_first(solved_sudoku, start_row, start_col)
-            # If depth first back tracked to root, attempt again from different start point
-            
+        #start_row, start_col = self.lowest_variable(solved_sudoku, 0, 0) 
+        start_row, start_col = self.lowest_variable(sudoku)
+        # Alters the values in the solved_sudoku
+        # Begin depth first search from the top left square
+        self.depth_first(solved_sudoku, start_row, start_col)
+        # If depth first back tracked to root, attempt again from different start point
+        
+        # If no change, no solution
+        if not self.complete(solved_sudoku):
+            print("No solution")
+            solved_sudoku = np.full((9, 9), -1.)
+        
         return solved_sudoku
 
 solver = Solver()
-#sudoku = sudokus[0]
-#print("Before:")
-#print(sudoku)
 
-#print("After:")
-#print(solver.sudoku_solver(sudokus[0]))
-
-count = -1
-correct = 0
+count = 0
 for sudoku in sudokus:
-    count += 1
     print(count)
     print("Before:")
     print(sudoku)
     print("After:")
     result = solver.sudoku_solver(sudoku)
     print(result)
-    if np.array_equal(result, np.array(sudoku)):
-        correct += 1
     print()
-print("Correct:", correct)
-
-
-#print("After:")
-#print(solver.sudoku_solver(sudokus[10]))
+    count += 1
