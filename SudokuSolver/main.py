@@ -66,11 +66,9 @@ def next_variable(sudoku, row, col):
         else:
             new_col += 1
             
-        if sudoku[new_row][new_col] == 0:
-            return new_row, new_col
-        
-        # No available variables
-        if new_row == row and new_col == col:
+        # If this location has a zero, return it
+        # But if there are no available variables left return the origional
+        if sudoku[new_row][new_col] == 0  or (new_row == row and new_col == col):
             return new_row, new_col
 
 def traverse(sudoku, row, col, constraints):
@@ -86,12 +84,20 @@ def traverse(sudoku, row, col, constraints):
         if len(new_constraints) != 0:
             traverse(new_sudoku, new_row, new_col, new_constraints)
             
-def traverse_(sudoku, row, col, complete):
+def depth_first(sudoku, row, col):
+    # Get constraints for this variable
     constraints = apply_constraints(sudoku, row, col)
+    
     for val in constraints:
-        sudoku[row][col] = val
+        sudoku[row][col] = val  # Test value
         new_row, new_col = next_variable(sudoku, row, col)
-        if traverse_(sudoku, new_row, new_col, complete):
+        
+        # If row and column have not changed -> SOLVED
+        if new_row == row and new_col == col:
+            return True
+        
+        # Continue with modifed board on new row and column
+        if depth_first(sudoku, new_row, new_col):
             return True
     sudoku[row][col] = 0  # Reset this variable on backtrack
     return False
@@ -115,7 +121,8 @@ def sudoku_solver(sudoku):
     # Choose starting variable with fewest constraints
     start_row, start_col = lowest_variable(solved_sudoku)  
     constraints = apply_constraints(solved_sudoku, start_row, start_col)
-    solved_sudoku = traverse_(solved_sudoku, 0, 0, False)
+    # Begin depth first search from the top left square
+    depth_first(solved_sudoku, 0, 0)
         
     print(solved_sudoku)
     return solved_sudoku
