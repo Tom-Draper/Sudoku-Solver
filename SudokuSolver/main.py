@@ -39,33 +39,16 @@ class Solver:
 
     def complete(self, sudoku):
         # Checks whether the sudoku is complete.
+        
         for i in range(len(sudoku)):
             for j in range(len(sudoku[0])):
                 if sudoku[i][j] == 0 and self.apply_constraints(sudoku, i, j) != 0:
                     return False
         return True
-    
-    def lowest_variable(self, sudoku, row, col):
-        # Returns the variable found with lowest number of constraints.
-        min_val = len(sudoku)  # Initially hold maximum number of values
-        variables = []
-        for i in range(len(sudoku)):
-            for j in range(len(sudoku[0])):
-                if sudoku[i][j] == 0:
-                    n = len(self.apply_constraints(sudoku, i, j))
-                    if n == 1:
-                        return i, j
-                    variables.append(tuple((n, i, j)))
-
-        if len(variables) > 0:
-            variables.sort(key=lambda x: x[0])
-            return variables[0][1], variables[0][2]
-        
-        return self.next_along(sudoku, row, col)
 
     def next_along(self, sudoku, row, col):
         # Returns the next empty variable by searching columns by rows.
-
+        
         new_row, new_col = row, col
         while True:
             if new_col + 1 == len(sudoku):
@@ -84,19 +67,20 @@ class Solver:
 
     def next_variable(self, sudoku, row, col):
         # Returns the variable found with lowest number of constraints.
-        constraints = []
         min_val = len(sudoku)  # Initially hold maximum number of values
+        variables = []
         for i in range(len(sudoku)):
             for j in range(len(sudoku[0])):
                 if sudoku[i][j] == 0:
-                    # If this variable has the fewest number of constraints save as start
-                    constraints = self.apply_constraints(sudoku, i, j)
-                    if len(constraints) < min_val:
-                        min_val = len(constraints)
-                        row, col = i, j  # Save to return
-                    if min_val == 1:
-                        return row, col
-                    
+                    n = len(self.apply_constraints(sudoku, i, j))
+                    if n == 1:
+                        return i, j
+                    variables.append(tuple((n, i, j)))
+
+        if len(variables) > 0:
+            variables.sort(key=lambda x: x[0])
+            return variables[0][1], variables[0][2]
+        
         return self.next_along(sudoku, row, col)
                 
     def depth_first(self, sudoku, row, col):
@@ -107,7 +91,7 @@ class Solver:
         
         for val in constraints:
             sudoku[row][col] = val  # Test value
-            new_row, new_col = self.lowest_variable(sudoku, row, col)
+            new_row, new_col = self.next_variable(sudoku, row, col)
             
             # If row and column have not changed -> SOLVED
             if new_row == row and new_col == col:
@@ -136,7 +120,7 @@ class Solver:
         solved_sudoku = sudoku
         
         #start_row, start_col = self.lowest_variable(solved_sudoku, 0, 0) 
-        start_row, start_col = self.lowest_variable(sudoku, 0, 0)
+        start_row, start_col = self.next_variable(sudoku, 0, 0)
         # Alters the values in the solved_sudoku
         # Begin depth first search from the top left square
         self.depth_first(solved_sudoku, start_row, start_col)
