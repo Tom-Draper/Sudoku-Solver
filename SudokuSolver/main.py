@@ -1,14 +1,11 @@
 import numpy as np
-import os
+import time
 
-# Load sudokus
-sudokus = np.load("data/sudokus.npy")
 
 class Solver:
     def apply_constraints(self, sudoku, row_idx, col_idx):
-        # Narrows down the possible values in a given (row, column) based on 
-        # the other values in the board
-        # Returns a list of the possible values
+        """Narrows down the possible values in a given (row, column) based on 
+        the other values in the board. Returns a list of the possible values."""
         
         possible = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         
@@ -38,17 +35,41 @@ class Solver:
         return possible
 
     def complete(self, sudoku):
-        # Checks whether the sudoku is complete.
+        """Checks whether the input sudoku is complete."""
         
         for i in range(len(sudoku)):
             for j in range(len(sudoku[0])):
                 if sudoku[i][j] == 0 and self.apply_constraints(sudoku, i, j) != 0:
                     return False
         return True
-
-    def next_along(self, sudoku, row, col):
-        # Returns the next empty variable by searching columns by rows.
+    
+    def next_variable3(self, sudoku, row, col):
+        """The much slower alternatvie to next_variable function.
+        This function will produce the longest time to find a the solution as
+        the branching factor is a maximum during depth-first search.
+        Returns the variable found with highest number of constraints."""
         
+        var_info = []  # Holds tuples of number of constraints, and position
+        for i in range(len(sudoku)):
+            for j in range(len(sudoku[0])):
+                if sudoku[i][j] == 0:
+                    n = len(self.apply_constraints(sudoku, i, j))
+                    if n == 9:  # If maximum constraints found, cannot find better
+                        return i, j
+                    var_info.append(tuple((n, i, j)))
+
+        # Sort list and take variable with most constraints
+        if len(var_info) > 0:
+            var_info.sort(key=lambda x: x[0], reverse=True)
+            return var_info[0][1], var_info[0][2]
+        
+        # If no constraints found, return input row and column
+        return row, col
+    
+    def next_variable2(self, sudoku, row, col):
+        """A longer alternative to the next_variable function.
+        Returns the next empty variable by searching along columns by rows."""
+
         new_row, new_col = row, col
         while True:
             if new_col + 1 == len(sudoku):
@@ -59,32 +80,33 @@ class Solver:
                     new_row += 1
             else:
                 new_col += 1
-
             # If this location has a zero, return it
             # But if there are no available variables left return the origional
             if sudoku[new_row][new_col] == 0  or (new_row == row and new_col == col):
                 return new_row, new_col
 
     def next_variable(self, sudoku, row, col):
-        # Returns the variable found with lowest number of constraints.
-        min_val = len(sudoku)  # Initially hold maximum number of values
-        variables = []
+        """Returns the variable found with lowest number of constraints."""
+        
+        var_info = []  # Holds tuples of number of constraints, and position
         for i in range(len(sudoku)):
             for j in range(len(sudoku[0])):
                 if sudoku[i][j] == 0:
                     n = len(self.apply_constraints(sudoku, i, j))
-                    if n == 1:
+                    if n == 1:  # If only one constraint, cannot find better
                         return i, j
-                    variables.append(tuple((n, i, j)))
+                    var_info.append(tuple((n, i, j)))
 
-        if len(variables) > 0:
-            variables.sort(key=lambda x: x[0])
-            return variables[0][1], variables[0][2]
+        # Sort list and take variable with least constraints
+        if len(var_info) > 0:
+            var_info.sort(key=lambda x: x[0])
+            return var_info[0][1], var_info[0][2]
         
-        return self.next_along(sudoku, row, col)
-                
+        # If no constraints found, return original input row and column
+        return row, col
+
     def depth_first(self, sudoku, row, col):
-        # Recursively uses depth first search to find a solution.
+        """Recursively uses depth first search to find a solution."""
         
         # Get constraints for this variable
         constraints = self.apply_constraints(sudoku, row, col)
@@ -93,7 +115,7 @@ class Solver:
             sudoku[row][col] = val  # Test value
             new_row, new_col = self.next_variable(sudoku, row, col)
             
-            # If row and column have not changed -> SOLVED
+            # If row and column are unchanged -> all placed filled
             if new_row == row and new_col == col:
                 print("SOLVED")
                 return True
@@ -118,30 +140,39 @@ class Solver:
         """
         
         solved_sudoku = sudoku
-        
-        #start_row, start_col = self.lowest_variable(solved_sudoku, 0, 0) 
         start_row, start_col = self.next_variable(sudoku, 0, 0)
         # Alters the values in the solved_sudoku
         # Begin depth first search from the top left square
         self.depth_first(solved_sudoku, start_row, start_col)
-        # If depth first back tracked to root, attempt again from different start point
         
-        # If no change, no solution
         if not self.complete(solved_sudoku):
             print("No solution")
             solved_sudoku = np.full((9, 9), -1.)
         
         return solved_sudoku
 
-solver = Solver()
 
-count = 0
-for sudoku in sudokus:
-    print(count)
-    print("Before:")
-    print(sudoku)
-    print("After:")
-    result = solver.sudoku_solver(sudoku)
-    print(result)
-    print()
-    count += 1
+def run(sudokus, solutions):
+    for i in range(len(sudokus)):
+        print(i+1)
+        print("Before:")
+        print(sudokus[i])
+        print("After:")
+        start = time.time()
+        result = solver.sudoku_solver(sudokus[i])
+        time_taken = time.time() - start
+        print(result)
+        print("Solution:")
+        print(solutions[i])
+        print("Correct:", np.array_equal(solutions[i], result))
+        print("Time taken:", time_taken, "seconds")
+        print("-" * 40)
+
+
+# Load sudokus
+sudokus = np.load("data/sudokus.npy")
+# Load solutions to sample sudokus
+solutions = np.load("data/sudoku_solutions.npy")
+
+solver = Solver()
+run(sudokus, solutions)
