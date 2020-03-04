@@ -1,8 +1,8 @@
 # Sudoku-Solver
 
 ## Sudoku
-Sudoku is a Japanese puzzle where the aim is to fill a 9x9 grid with digits so that any row, column and 3x3 sub-grid are filled with only unique values (1-9). The puzzle begins with initial starting values already filled in. In 2005, Bertram Felgenhauer and Frazer Jarvis calculated number of valid Sudoku solution grids for a 9x9 grid to be 9! × 722 × 27 × 27,704,267,971 = 6,670,903,752,021,072,936,960.
-https://en.wikipedia.org/wiki/Sudoku
+Sudoku is a Japanese puzzle where the aim is to fill a 9x9 grid with digits so that any row, column and 3x3 sub-grid are filled with only unique values (1-9). The puzzle begins with initial starting values already filled in. In 2005, Bertram Felgenhauer and Frazer Jarvis calculated number of valid Sudoku solution grids for a 9x9 grid to be 9! × 722 × 27 × 27,704,267,971 = 6,670,903,752,021,072,936,960.    
+https://en.wikipedia.org/wiki/Sudoku    
 https://en.wikipedia.org/wiki/Mathematics_of_Sudoku
 
 The Sudoku solver takes a 9x9 numpy array and solves a Sudoku puzzle using a backtracking algorithm and depth first search. It makes use of constraint satisfaction to minimise down the options a particular square could take. Once run, it returns a completed puzzle. in If it finds no solution to the Sudoku, it instead returns a 9x9 array filled with -1.
