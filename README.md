@@ -12,7 +12,7 @@ The soluton selects a starting variable (single Sudoku squre that can hold an in
 This program also includes alternative slower methods to find the next variable such as finding the next empty space moving across columns and rows from the last variable. It also includes the slowest method of taking the variable with the most constraints.
 Once the variable is found, it performs a recursive depth first search, the the variable taking each possible values after taking the current constriants into consideration. For each value the square has taken it finds the next variable, which finds possible values using constraints based on the modified board. And so on until it reaches a variable that has no possible values it can take. At this point is backtracks up the tree until it reaches a previously visited variable with a possible value that hasn't been explored yet. This continues until a solution is found. If there is no solution, eventually the algorithm backs up all the way to the root node and terminates.
 
-![Depth First Search](images/depth-first-search.jpg)
+![depth-first-search](https://user-images.githubusercontent.com/41476809/76250443-4a761080-623d-11ea-999d-0c4ddc341572.jpg)
 
 ### Prerequisites
 Required Python modules:
