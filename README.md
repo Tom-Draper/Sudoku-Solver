@@ -11,7 +11,7 @@ The Sudoku solver takes a 9x9 numpy array and solves a Sudoku puzzle using a bac
 Run main.py
 
 ### Prerequisites
-Python module numpy is required to run.
+The numpy Python module is required.
 
 ## How it Works
 The soluton selects a starting variable (single Sudoku squre that can hold an integer value) by analysing each variables constraints at that time. For each variable, it looks at the other variables and reduces down the options to a list of possible values this variable can take. The variable with the lowest number of options that it can take is selected first.    
