@@ -14,7 +14,6 @@ Run main.py
 Required Python modules:
 - numpy
 
-
 ## How it Works
 The soluton selects a starting variable (single Sudoku squre that can hold an integer value) by analysing each variables constraints at that time. For each variable, it looks at the other variables and reduces down the options to a list of possible values this variable can take. The variable with the lowest number of options that it can take is selected first.    
 This program also includes alternative slower methods to find the next variable such as finding the next empty space moving across columns and rows from the last variable. It also includes the slowest method of taking the variable with the most constraints.
