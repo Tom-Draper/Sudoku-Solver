@@ -7,6 +7,14 @@ https://en.wikipedia.org/wiki/Mathematics_of_Sudoku
 
 The Sudoku solver takes a 9x9 numpy array and solves a Sudoku puzzle using a backtracking algorithm and depth first search. It makes use of constraint satisfaction to minimise down the options a particular square could take. Once run, it returns a completed puzzle. in If it finds no solution to the Sudoku, it instead returns a 9x9 array filled with -1.
 
+## Getting Started
+Run main.py
+
+### Prerequisites
+Required Python modules:
+- numpy
+
+
 ## How it Works
 The soluton selects a starting variable (single Sudoku squre that can hold an integer value) by analysing each variables constraints at that time. For each variable, it looks at the other variables and reduces down the options to a list of possible values this variable can take. The variable with the lowest number of options that it can take is selected first.    
 This program also includes alternative slower methods to find the next variable such as finding the next empty space moving across columns and rows from the last variable. It also includes the slowest method of taking the variable with the most constraints.
@@ -14,6 +22,3 @@ Once the variable is found, it performs a recursive depth first search, the the 
 
 ![depth-first-search](https://user-images.githubusercontent.com/41476809/76250443-4a761080-623d-11ea-999d-0c4ddc341572.jpg)
 
-### Prerequisites
-Required Python modules:
-- numpy
